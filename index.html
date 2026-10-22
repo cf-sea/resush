@@ -54,7 +54,7 @@ R.forEach(function(r){var x=r[1],m=r[2],has=x!==''&&x!=null&&!isNaN(x);if(has){a
 h+='<div class="row"><span>'+esc(r[0])+(chg(PR,r)?' <span class="chip nw">новое</span>':'')+'</span><b>'+(has?esc(x):'—')+(m!==''&&m!=null?' / '+esc(m):'')+'</b></div>'});
 if(g)h+='<div class="row tot"><span>Итого</span><span>'+a+' / '+b+'</span></div>';
 return h+'</div>'}
-function scl(){var d=DB.scale;return d&&d.length==3?d:[85,65,40]}
+function scl(){return[85,65,40]}
 function sm(R){var sc=0,mx=0,ms=0,h=0;R.forEach(function(r){var m=+r[2]||0,x=r[1],ok=x!==''&&x!=null&&!isNaN(x);if(ok){sc+=+x;h++}if(m>0){mx+=m;if(!ok)ms=1}});return{sc:sc,mx:mx,ms:ms,h:h}}
 function nd(s){if(!s.a||!s.b||!s.a.length)return'';var a=sm(s.a),b=sm(s.b),mb=b.mx>0?b.mx:(s.mb||0);if(!a.mx||a.ms||!mb||!(b.ms||!b.h))return'';
 var wa=s.wa||50,wb=s.wb||50,base=wa*a.sc/a.mx,h='<div class="card"><b>Что нужно набрать на СОЧ</b><p>СОР: '+Math.round(a.sc/a.mx*1000)/10+'% (вес '+wa+'%), вес СОЧ: '+wb+'%. Максимум за четверть: '+Math.round((base+wb)*10)/10+'%. Проценты округляются до целых, поэтому граница на 0,5 ниже.</p>';
@@ -68,7 +68,7 @@ function ratio(R){var sc=0,mx=0;R.forEach(function(r){var m=+r[2];if(ok(r[1])&&m
 function tot(R){var sc=0,mx=0;R.forEach(function(r){var m=+r[2];if(ok(r[1])&&m>0){sc+=+r[1];mx+=m}});return mx?r1(sc)+' / '+r1(mx)+' ('+Math.round(sc/mx*1000)/10+'%)':'—'}
 function bed(k,t,R){var h='<div class="card"><b>'+t+'</b>';
 R.forEach(function(r,i){h+='<div class="row"><span>'+esc(r[0])+'</span><span style="white-space:nowrap"><input class="in" type="number" inputmode="decimal" step="any" data-k="'+k+'" data-r="'+i+'" data-f="1" value="'+esc(r[1])+'"> / <input class="in" type="number" inputmode="decimal" step="any" data-k="'+k+'" data-r="'+i+'" data-f="2" value="'+esc(r[2])+'"></span></div>'});
-return h+'<div class="row tot"><span>Итого</span><span id="t'+k+'">'+tot(R)+'</span></div><button class="btn" data-go="add" data-k="'+k+'" style="margin-top:8px">+ Добавить раздел</button></div>'}
+return h+'<div class="row tot"><span>Итого</span><span id="t'+k+'">'+tot(R)+'</span></div></div>'}
 function resh(s){var wa=s.wa||50,wb=s.wb||50,ra=ratio(S.ed.a),rb=ratio(S.ed.b),t=(ra==null?0:wa*ra)+(rb==null?0:wb*rb),d=scl(),g=t>=d[0]-.5?5:t>=d[1]-.5?4:t>=d[2]-.5?3:2;
 return'<b>Итог: '+Math.round(t*10)/10+'% — оценка '+g+'</b><p>СОР: '+(ra==null?'не заполнен':Math.round(ra*1000)/10+'%')+' (вес '+wa+'%), СОЧ: '+(rb==null?'не заполнен, учтён как 0':Math.round(rb*1000)/10+'%')+' (вес '+wb+'%). Итог округляется до целого.</p>'}
 function detail(){var c=DB.snaps[0],s=c&&c.s[S.n];if(!s){S.v='home';return home()}var p=prev(s.n)||{};
@@ -77,7 +77,6 @@ function help(){return'<div class="card"><b>Как обновить оценки
 '<p class="mu">Версия сайта: 8. Если при запуске закладки видно «Открываю дневник…» или «Откройте «Дневник ЖКО»», это старая закладка, поставьте новую отсюда.</p>'+
 '<div class="card"><b>Закладка</b><p>На компьютере перетащите кнопку на панель закладок. На телефоне скопируйте код, добавьте любую страницу в закладки и вставьте код вместо её адреса (адрес должен начинаться с javascript:).</p><a class="bm" id="bma">Синхронизация СУШ</a><button class="btn" data-go="copy" data-t="code">Скопировать код</button><textarea readonly id="code">'+esc(bm())+'</textarea><p>Закладка привязана к адресу, с которого вы открыли этот сайт.</p></div>'+
 '<div class="card"><b>Запасная закладка</b><p>Работает медленнее (около 30–40 секунд), но не зависит от внутренних адресов СУШ. Используйте, если быстрая выдаёт ошибку.</p><a class="bm" id="bmb">Синхронизация (запасная)</a><button class="btn" data-go="copy" data-t="code2">Скопировать код</button><textarea readonly id="code2">'+esc(bm(EX))+'</textarea></div>'+
-'<div class="card"><b>Шкала оценок</b><p>Нижняя граница в процентах для оценок 5, 4 и 3. Сверьте с вкладкой «Шкала перевода» в СУШ.</p>5: <input type="number" data-sc="0" value="'+scl()[0]+'" style="width:64px"> 4: <input type="number" data-sc="1" value="'+scl()[1]+'" style="width:64px"> 3: <input type="number" data-sc="2" value="'+scl()[2]+'" style="width:64px"></div>'+
 '<div class="card"><b>Установить как приложение</b><p>Android (Chrome): меню ⋮ → «Установить приложение» или «Добавить на главный экран». iPhone (Safari): «Поделиться» → «На экран Домой». После этого сайт открывается как приложение и работает без интернета.</p><p>На iPhone приложение с главного экрана хранит данные отдельно от Safari, поэтому синхронизацию удобнее делать и смотреть оценки в одном и том же месте.</p></div>'+
 '<div class="card"><b>Конфиденциальность</b><p>Пароли никуда не передаются. Оценки передаются из СУШ в адресе после знака #, он не отправляется на сервер, и хранятся только в памяти этого браузера.</p><button class="btn" data-go="clear">Удалить сохранённые данные</button></div>'}
 function render(){var h='<header><h1>Оценки СУШ</h1><div><button class="btn" data-go="home">Главная</button> <button class="btn" data-go="help">Установка</button></div></header>';
@@ -87,7 +86,6 @@ A.innerHTML=h;var a=document.getElementById('bma');if(a)a.href=bm();a=document.g
 A.onclick=function(e){var t=e.target.closest('[data-go],[data-i]');if(!t)return;
 var gg=t.dataset.go,c0=DB.snaps[0],s0=c0&&c0.s[S.n];
 if(gg=='edit'&&s0){S.edit=1;S.ed={a:JSON.parse(JSON.stringify(s0.a||[])),b:JSON.parse(JSON.stringify(s0.b||[]))};render();window.scrollTo(0,0);return}
-if(gg=='add'&&S.ed){S.ed[t.dataset.k].push(['Новый раздел','','']);render();return}
 if(gg=='unedit'){S.edit=0;S.ed=null;render();window.scrollTo(0,0);return}
 S.edit=0;S.ed=null;
 if(t.dataset.i!=null){S.n=+t.dataset.i;S.v='detail'}
@@ -98,7 +96,6 @@ render();window.scrollTo(0,0)};
 A.oninput=function(e){var t=e.target;if(t.dataset.r==null||!S.ed)return;var c=DB.snaps[0],s=c&&c.s[S.n];if(!s)return;
 S.ed[t.dataset.k][+t.dataset.r][+t.dataset.f]=t.value;
 document.getElementById('t'+t.dataset.k).textContent=tot(S.ed[t.dataset.k]);document.getElementById('res').innerHTML=resh(s)};
-A.onchange=function(e){var i=e.target.dataset.sc;if(i==null)return;var d=scl().slice();d[i]=+e.target.value||0;DB.scale=d;save()};
 load();ingest();render();
 if('serviceWorker' in navigator&&/^https?:/.test(location.protocol))navigator.serviceWorker.register('sw.js').catch(function(){});
 })();
